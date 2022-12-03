@@ -1,25 +1,65 @@
-import logo from './logo.svg';
 import './App.css';
+import { Navbar, CreateProduct, ProductDetails, Cart, Home } from './components/index';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Routes, Route } from 'react-router-dom';
+
+import React, { Component } from 'react'
+
+import { fetchProducts } from './action/index';
+
+
+import { StoreContext } from './';
+
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
+class App extends Component {
+
+  componentDidMount() {
+    const { store } = this.props;
+
+    store.dispatch(fetchProducts());
+
+    store.subscribe(() => {
+      this.forceUpdate();
+    })
+
+  }
+
+  render() {
+
+    return (
+
+      <div className="App">
+        <Navbar />
+
+        <Routes>
+          <Route exact path='/' element={<Home />} />
+          <Route exact path='/Cart' element={<Cart />} />
+          <Route exact path='/ProductDetails/:productId' element={<ProductDetails />} />
+          <Route exact path='/CreateProduct' element={<CreateProduct />} />
+        </Routes>
+        <ToastContainer />
+      </div>
+    );
+  }
 }
 
-export default App;
+
+class AppWrapper extends Component {
+  render() {
+    return (
+      <StoreContext.Consumer>
+        {
+          (store) => <App store={store} />
+        }
+      </StoreContext.Consumer>
+    )
+  }
+}
+
+export default AppWrapper;
+
